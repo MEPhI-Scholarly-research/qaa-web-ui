@@ -5,24 +5,41 @@ type Response = {
   id: string
   active: boolean
 }
-
-const { socket, connected } = await getIO()
-
-socket.emit('quiz.content', { id: undefined })
-
-socket.on('quiz.content', (data: Response) => {
-  console.log({ data })
-})
-
 export default {
+  name: 'Home',
+  async mounted() {
+    const handleConnect = () => {
+      this.connected = true
+    }
+
+    const handleDisconnect = () => {
+      this.connected = false
+    }
+
+    const socket = getIO(handleConnect, handleDisconnect)
+
+    socket.emit('quiz.content', { id: '1234' })
+
+    socket.on('quiz.content', (data: Response) => {
+      console.log({ data })
+    })
+  },
+  methods: {
+    increment() {
+      this.counter++
+    }
+  },
   data() {
     return {
-      connected: connected
+      counter: 0,
+      connected: false
     }
   }
 }
 </script>
 
 <template>
-  <h1>Connected: {{ connected }}</h1>
+  {{ counter }}
+  <button @click="increment">inc</button>
+  <span>connected: {{ connected }}</span>
 </template>

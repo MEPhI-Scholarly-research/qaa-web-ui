@@ -1,0 +1,52 @@
+body {
+  font-family: 'Montserrat';
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  gap: 50px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 100px;
+}
+
+.card {
+  border-radius: var(--border-radius-l);
+  box-shadow: 0 0 30px 10px #33333323;
+  padding: 24px 32px;
+  max-width: 600px;
+  min-width: 400px;
+}
+
+.card .footer {
+  display: flex;
+  width: 100%;
+  justify-content: end;
+}
+
+.card .title {
+  font-family: MontserratBold;
+  font-size: 24px;
+  color: var(--text-main-color);
+  margin-bottom: 16px;
+}
+
+.card .desc {
+  font-family: Montserrat;
+  letter-spacing: 0.5px;
+}
+
+.card .input {
+  margin: 32px 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.card .input input {
+  width: 80%;
+}
