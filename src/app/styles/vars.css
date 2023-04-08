@@ -1,0 +1,14 @@
+:root {
+  /* colors */
+  --main-color: #1c13b9;
+  --main-color-hover: #2f26d1;
+  --main-color-active: #1f18a1;
+  --accent-color: rgb(191, 16, 162);
+  --text-main-color: #333;
+  --text-main-color-hover: #4c4c4c;
+  --text-main-color-reverse: white;
+
+  /* sized */
+  --border-radius-m: 4px;
+  --border-radius-l: 8px;
+}
