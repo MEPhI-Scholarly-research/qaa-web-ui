@@ -1,18 +1,13 @@
 import { defineStore } from 'pinia'
 
-export const useSocketStore = defineStore({
-  id: 'socket',
-  state: () => ({
-    connected: false
-  }),
+export const useSocketStore = defineStore('socketStore', {
+  state: () => ({ connected: false }),
   getters: {
-    connected: (state) => {
-      return state.connected
-    }
+    getConnected: (state) => state.connected
   },
   actions: {
-    changeConnected(newValue: boolean) {
-      this.$patch({ connected: newValue })
+    setConnected(newValue: boolean) {
+      this.connected = newValue
     }
   }
 })
