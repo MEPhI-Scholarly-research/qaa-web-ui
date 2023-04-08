@@ -1,32 +1,32 @@
+<script lang="ts">
+import { routes, type Route } from '@/app/routes/routes'
+
+export default {
+  name: 'MainHeader',
+  data() {
+    return { routes: this.$router.options.routes as Route[] }
+  }
+}
+</script>
+
 <template>
   <header>
     <nav class="headerMenu">
       <div class="logo">
         <span class="logoLabel">
-          <router-link :to="{ name: 'home' }"> QUAN </router-link>
+          <router-link :to="{ name: 'home' }">QUAN</router-link>
         </span>
       </div>
       <ul class="menu">
-        <li>
-          <router-link :to="{ name: 'home' }">
-            <span class="itemLabel">Home</span>
-          </router-link>
-        </li>
-        <li>
-          <router-link :to="{ name: 'invite' }">
-            <span class="itemLabel">Play</span>
+        <li v-for="route in routes" :key="route.name">
+          <router-link :to="{ name: route.name }" v-if="route.meta.show">
+            <span class="itemLabel">{{ route.meta.title }}</span>
           </router-link>
         </li>
       </ul>
     </nav>
   </header>
 </template>
-
-<script lang="ts">
-export default {
-  name: 'MainHeader'
-}
-</script>
 
 <style lang="scss">
 header {

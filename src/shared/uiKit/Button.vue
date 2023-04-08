@@ -27,8 +27,8 @@ export default defineComponent({
   background-color: var(--main-color);
   color: var(--text-main-color-reverse);
   font-family: MontserratBold;
-  padding: 13px 30px;
-  border-radius: var(--border-radius-m);
+  padding: 18px 30px;
+  border-radius: var(--border-radius-l);
   transition: background-color 0.15s ease-in-out;
 }
 
