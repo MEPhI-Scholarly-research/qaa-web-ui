@@ -20,6 +20,5 @@ import MainHeader from '@/shared/components/Header.vue'
 .content {
   width: 100vw;
   height: calc(100vh - 60px);
-  overflow: auto;
 }
 </style>
