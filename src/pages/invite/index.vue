@@ -1,7 +1,7 @@
 <script lang="ts">
+import router from '@/app/routes'
 import KitInput from '@/shared/uiKit/Input.vue'
 import KitButton from '@/shared/uiKit/Button.vue'
-import router from '@/app/routes'
 
 export default {
   name: 'InvitePage',
@@ -25,7 +25,7 @@ export default {
 
 <template>
   <div class="invite">
-    <span class="inviteDesc">Введи уникальный код для старта квиза </span>
+    <span class="inviteDesc">Введи уникальный код для старта квиза</span>
     <div class="inviteInput">
       <KitInput :value="code" :onChange="onChangeCode" placeholder="Здесь укажите код..." />
       <KitButton title="Начать" :onClick="onEnter" mode="normal" />

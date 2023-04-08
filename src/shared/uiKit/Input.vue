@@ -34,12 +34,12 @@ export default defineComponent({
 
 <style>
 .kit-input {
-  border: 1px solid #d3d7ec;
-  background-color: #e5e8f8;
-  padding: 12px 8px;
+  background-color: rgb(232, 240, 254);
+  padding: 1.2rem;
   font-family: Montserrat;
   color: var(--text-main-color);
-  border-radius: var(--border-radius-m);
+  border-radius: var(--border-radius-l);
   width: 100%;
+  height: 55px;
 }
 </style>
