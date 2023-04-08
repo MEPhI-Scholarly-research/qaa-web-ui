@@ -2,7 +2,9 @@
   <header>
     <nav class="headerMenu">
       <div class="logo">
-        <span class="logoLabel">QUAN</span>
+        <span class="logoLabel">
+          <router-link :to="{ name: 'home' }"> QUAN </router-link>
+        </span>
       </div>
       <ul class="menu">
         <li>
@@ -11,7 +13,7 @@
           </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'play' }">
+          <router-link :to="{ name: 'invite' }">
             <span class="itemLabel">Play</span>
           </router-link>
         </li>
@@ -34,7 +36,7 @@ header {
   width: 100vw;
   height: 60px;
   background-color: #ffffff7f;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
   padding: 0 32px;
 
   nav.headerMenu {
@@ -47,6 +49,9 @@ header {
       font-family: MontserratBlack;
       letter-spacing: 2px;
       font-size: 18px;
+      a {
+        color: var(--text-main-color);
+      }
     }
 
     .menu {
