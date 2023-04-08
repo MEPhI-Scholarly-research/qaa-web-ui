@@ -13,5 +13,10 @@ export const routes: RouteRecordRaw[] = [
     path: '/about',
     name: 'about',
     component: AboutView
+  },
+  {
+    path: '/play',
+    name: 'play',
+    component: AboutView
   }
 ]
