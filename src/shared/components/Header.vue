@@ -1,5 +1,5 @@
 <script lang="ts">
-import { routes, type Route } from '@/app/routes/routes'
+import type { Route } from '@/app/routes/routes'
 
 export default {
   name: 'MainHeader',
