@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 import HomeView from '@/pages/home/index.vue'
-import AboutView from '@/pages/about/index.vue'
+import PlayView from '@/pages/play/index.vue'
 import InvitePage from '@/pages/invite/index.vue'
 import AuthPage from '@/pages/auth/index.vue'
 
@@ -25,16 +25,6 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/about',
-    name: 'about',
-    component: AboutView,
-    meta: {
-      title: 'About',
-      private: false,
-      show: false
-    }
-  },
-  {
     path: '/invite',
     name: 'invite',
     component: InvitePage,
@@ -47,10 +37,10 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/play',
     name: 'play',
-    component: AboutView,
+    component: PlayView,
     meta: {
       title: 'Play',
-      private: true,
+      private: false,
       show: false
     }
   },
