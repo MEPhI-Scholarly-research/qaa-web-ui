@@ -35,6 +35,7 @@ import KitButton from '@/shared/uiKit/Button.vue'
 import KitInput from '@/shared/uiKit/Input.vue'
 // import jwt from 'jsonwebtoken'
 import { setToken } from '@/shared/utils/auth/storage'
+import router from '@/app/routes'
 
 export default {
   name: 'AuthPage',
@@ -53,6 +54,8 @@ export default {
       const token =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
       setToken(token)
+      const { path, query } = this.$route.query as { path: string; query: string }
+      router.push({ path, query: JSON.parse(query) })
     }
   }
 }
