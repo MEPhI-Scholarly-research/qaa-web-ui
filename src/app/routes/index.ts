@@ -10,14 +10,14 @@ const router = createRouter({
 // authorization
 
 router.beforeEach((to, from, next) => {
-  const queryParams = to.query
-  const state = JSON.stringify(queryParams)
+  const path = to.path
+  const query = JSON.stringify(to.query)
 
   if (to.matched.some((route) => (route.meta as Meta).private)) {
     if (isAuth()) {
       next()
     } else {
-      next({ name: 'auth', query: { state } })
+      next({ name: 'auth', query: { path, query } })
     }
   } else {
     next()
