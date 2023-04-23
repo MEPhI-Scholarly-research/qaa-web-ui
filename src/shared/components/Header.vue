@@ -1,10 +1,27 @@
 <script lang="ts">
 import type { Route } from '@/app/routes/routes'
-
+import { getUserInfo, clearToken, clearUserInfo } from '@/shared/utils/auth/storage'
+import { isAuth } from '@/shared/utils'
+console.log({ auth: isAuth() })
 export default {
   name: 'MainHeader',
   data() {
-    return { routes: this.$router.options.routes as Route[] }
+    return {
+      routes: this.$router.options.routes as Route[],
+      displayName: getUserInfo()?.displayName,
+      isAuth: isAuth()
+    }
+  },
+  methods: {
+    logout() {
+      clearToken()
+      clearUserInfo()
+      this.$router.push({ name: 'home' })
+      this.isAuth = false
+    },
+    login() {
+      this.$router.push({ name: 'auth' })
+    }
   }
 }
 </script>
@@ -17,18 +34,27 @@ export default {
           <router-link :to="{ name: 'home' }">QUAN</router-link>
         </span>
       </div>
-      <ul class="menu">
-        <li v-for="route in routes" :key="route.name">
-          <router-link :to="{ name: route.name }" v-if="route.meta.show">
-            <span class="itemLabel">{{ route.meta.title }}</span>
-          </router-link>
-        </li>
-      </ul>
+      <div class="left">
+        <ul class="menu">
+          <li v-for="route in routes" :key="route.name">
+            <router-link :to="{ name: route.name }" v-if="route.meta.show">
+              <span class="itemLabel">{{ route.meta.title }}</span>
+            </router-link>
+          </li>
+          <li v-if="isAuth">
+            <span class="itemLabel" @click="logout">Log out</span>
+          </li>
+          <li v-if="!isAuth">
+            <span class="itemLabel" @click="login">Log in</span>
+          </li>
+        </ul>
+        <span class="logged" v-if="isAuth">Hello, {{ displayName }}</span>
+      </div>
     </nav>
   </header>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 header {
   position: sticky;
   left: 0;
@@ -54,17 +80,21 @@ header {
       }
     }
 
-    .menu {
+    .left {
       display: flex;
       gap: 8px;
-      .itemLabel {
-        font-family: Montserrat;
-        font-size: 15px;
-        color: var(--text-main-color);
-        transition: border-bottom 0.15s ease-in-out;
-        cursor: pointer;
-        &:hover {
-          border-bottom: 1px solid var(--accent-color);
+      .menu {
+        display: flex;
+        gap: 8px;
+        .itemLabel {
+          font-family: Montserrat;
+          font-size: 15px;
+          color: var(--text-main-color);
+          transition: border-bottom 0.15s ease-in-out;
+          cursor: pointer;
+          &:hover {
+            border-bottom: 1px solid var(--accent-color);
+          }
         }
       }
     }

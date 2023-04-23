@@ -40,7 +40,7 @@ export const routes: RouteRecordRaw[] = [
     component: PlayView,
     meta: {
       title: 'Play',
-      private: false,
+      private: true,
       show: false
     }
   },
