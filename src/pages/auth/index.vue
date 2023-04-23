@@ -33,9 +33,10 @@
 <script lang="ts">
 import KitButton from '@/shared/uiKit/Button.vue'
 import KitInput from '@/shared/uiKit/Input.vue'
-// import jwt from 'jsonwebtoken'
-import { setToken } from '@/shared/utils/auth/storage'
+import { setToken, setUserInfo } from '@/shared/utils/auth/storage'
 import router from '@/app/routes'
+import { apiClient } from '@/app/api'
+import type { AccessTokenPayload } from '@/shared/common/types'
 
 export default {
   name: 'AuthPage',
@@ -48,14 +49,21 @@ export default {
   },
   methods: {
     onAuth() {
-      /**
-       * Buffer.from error: https://github.com/microsoft/TypeScript/issues/23155
-       */
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-      setToken(token)
-      const { path, query } = this.$route.query as { path: string; query: string }
-      router.push({ path, query: JSON.parse(query) })
+      apiClient
+        .post<{ accessToken: string; payload: AccessTokenPayload }>('user/getAccessToken', {
+          login: this.login,
+          password: this.password
+        })
+        .then((response) => {
+          setToken(response.data.accessToken)
+          setUserInfo(response.data.payload)
+
+          const { path, query } = this.$route.query as { path: string; query: string }
+          router.push({ path, query: JSON.parse(query) })
+        })
+        .catch((err) => {
+          console.log({ err })
+        })
     }
   }
 }

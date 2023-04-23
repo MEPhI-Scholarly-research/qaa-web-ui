@@ -17,6 +17,7 @@ type Data = {
   error: {
     notFound: boolean
     quizInactive: boolean
+    other: boolean
   }
 }
 
@@ -36,12 +37,19 @@ export default {
         })
       })
       .catch((err: AxiosError) => {
-        if (err.response?.status === 404) {
-          this.error.notFound = true
+        switch (err?.response?.status) {
+          case 404:
+            this.error.notFound = true
+            break
+          case 451:
+            this.error.quizInactive = true
+            break
+
+          default:
+            this.error.other = true
+            break
         }
-        if (err.response?.status === 451) {
-          this.error.quizInactive = true
-        }
+
         this.loading = false
       })
   },
@@ -61,7 +69,8 @@ export default {
       loading: true,
       error: {
         notFound: false,
-        quizInactive: false
+        quizInactive: false,
+        other: false
       }
     } as Data
   }
@@ -71,7 +80,7 @@ export default {
 <template>
   <div class="loaderWrapper" v-if="loading"><Loader :loading="loading"></Loader></div>
 
-  <section class="main" v-if="!loading && !(error.notFound || error.quizInactive)">
+  <section class="main" v-if="!loading && !(error.notFound || error.quizInactive || error.other)">
     <Card
       :title="currentCard?.title"
       :description="currentCard?.description"
@@ -80,9 +89,13 @@ export default {
     ></Card>
   </section>
 
-  <div class="errorWrapper" v-if="!loading && (error.notFound || error.quizInactive)">
+  <div
+    class="errorWrapper"
+    v-if="!loading && (error.notFound || error.quizInactive || error.other)"
+  >
     <FallbackError title="NotFound" v-if="error.notFound"></FallbackError>
     <FallbackError title="Quiz is inactive" v-if="error.quizInactive"></FallbackError>
+    <FallbackError title="Other error" v-if="error.other"></FallbackError>
   </div>
 </template>
 
