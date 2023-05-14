@@ -42,13 +42,13 @@ export default {
             </router-link>
           </li>
           <li v-if="isAuth">
-            <span class="itemLabel" @click="logout">Log out</span>
+            <span class="itemLabel" @click="logout">Выйти</span>
           </li>
           <li v-if="!isAuth">
-            <span class="itemLabel" @click="login">Log in</span>
+            <span class="itemLabel" @click="login">Войти</span>
           </li>
         </ul>
-        <span class="logged" v-if="isAuth">Hello, {{ displayName }}</span>
+        <span class="logged" v-if="isAuth">Привет, {{ displayName }}</span>
       </div>
     </nav>
   </header>
@@ -76,6 +76,7 @@ header {
       letter-spacing: 2px;
       font-size: 18px;
       a {
+        line-height: 29px;
         color: var(--text-main-color);
       }
     }
@@ -92,6 +93,7 @@ header {
           color: var(--text-main-color);
           transition: border-bottom 0.15s ease-in-out;
           cursor: pointer;
+          line-height: 29px;
           &:hover {
             border-bottom: 1px solid var(--accent-color);
           }
@@ -99,5 +101,13 @@ header {
       }
     }
   }
+}
+
+.logged {
+  font-family: Montserrat;
+  background-color: var(--main-color);
+  color: var(--text-main-color-reverse);
+  padding: 5px 10px;
+  border-radius: 16px;
 }
 </style>

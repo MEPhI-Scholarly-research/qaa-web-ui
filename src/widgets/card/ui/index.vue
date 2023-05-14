@@ -1,20 +1,36 @@
 <script lang="ts">
 import type { PropType } from 'vue'
-import KitInput from '@/shared/uiKit/Input.vue'
+import CardInputContent from '../variants/Input.vue'
 
-type Props = {
+type CardType = 'input' | 'select'
+
+type PropsBase = {
   title: string
   description: string
   onSkip: (value: string) => void
   onNext: (value: string) => void
 }
 
+type InputProps = PropsBase & {
+  inputType: 'string' | 'number'
+}
+
+type SelectProps = PropsBase & {
+  answers: {
+    title: string
+    value: string
+  }
+}
+
+type Props<Type> = Type extends 'input' ? InputProps : SelectProps
+
 export default {
   name: 'card',
-  components: { KitInput },
+  components: { CardInputContent },
   props: {
-    title: Object as PropType<Props['title']>,
+    title: Object as PropType<Props<'input'>['title']>,
     description: Object as PropType<Props['description']>,
+    type: Object as PropType<CardType>,
     onSkip: Object as PropType<Props['onSkip']>,
     onNext: Object as PropType<Props['onNext']>
   },
@@ -44,13 +60,13 @@ export default {
       {{ description }}
     </div>
     <div class="cardInput">
-      <KitInput :value="value" :on-change="onChange" placeholder="Ваш ответ:"></KitInput>
+      <CardInputContent :value="value" :on-change="onChange" />
     </div>
     <div class="footer">
       <div class="skip">
-        <button class="btn btn-transparent button-skip" @click="onLocalSkip">skip</button>
+        <button class="btn btn-transparent button-skip" @click="onLocalSkip">пропустить</button>
       </div>
-      <div class="next"><button class="btn button-next" @click="onLocalNext">next</button></div>
+      <div class="next"><button class="btn button-next" @click="onLocalNext">далее</button></div>
     </div>
   </div>
 </template>
