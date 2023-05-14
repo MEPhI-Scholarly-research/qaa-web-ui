@@ -1,38 +1,7 @@
-<template>
-  <div class="container">
-    <div class="wrapper">
-      <h2 class="login-title">Вход</h2>
-
-      <div class="login-form">
-        <div>
-          <label for="email">Логин</label>
-          <KitInput
-            placeholder="Введите логин"
-            :value="login"
-            :onChange="(value) => (login = value)"
-          />
-        </div>
-
-        <div>
-          <label for="password">Пароль</label>
-          <KitInput
-            placeholder="Введите пароль"
-            :value="password"
-            :onChange="(value) => (password = value)"
-          />
-        </div>
-
-        <div class="submit">
-          <KitButton title="Войти" :onClick="onAuth" />
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
 import KitButton from '@/shared/uiKit/Button.vue'
 import KitInput from '@/shared/uiKit/Input.vue'
+import KitLink from '@/shared/uiKit/Link.vue'
 import { setToken, setUserInfo } from '@/shared/utils/auth/storage'
 import router from '@/app/routes'
 import { apiClient } from '@/app/api'
@@ -40,7 +9,7 @@ import type { AccessTokenPayload } from '@/shared/common/types'
 
 export default {
   name: 'AuthPage',
-  components: { KitButton, KitInput },
+  components: { KitButton, KitInput, KitLink },
   data() {
     return {
       login: '',
@@ -68,6 +37,43 @@ export default {
   }
 }
 </script>
+
+<template>
+  <div class="container">
+    <div class="wrapper">
+      <h2 class="login-title">Вход</h2>
+
+      <div class="login-form">
+        <div>
+          <label for="email">Логин</label>
+          <KitInput
+            placeholder="Введите логин"
+            :value="login"
+            :onChange="(value) => (login = value)"
+          />
+        </div>
+
+        <div>
+          <label for="password">Пароль</label>
+          <KitInput
+            placeholder="Введите пароль"
+            :value="password"
+            :onChange="(value) => (password = value)"
+            type="password"
+          />
+        </div>
+
+        <div>
+          <KitLink to="registration" title="Регистрация" />
+        </div>
+
+        <div class="submit">
+          <KitButton title="Войти" :onClick="onAuth" />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss">
 .container {
@@ -105,6 +111,7 @@ export default {
 .login-form label {
   display: block;
   margin-bottom: 8px;
+  font-size: 14px;
 }
 
 .login-form input {
