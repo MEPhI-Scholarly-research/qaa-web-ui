@@ -1,5 +1,12 @@
 <template>
-  <input class="kit-input" :value="value" @change="onChangeValue" :placeholder="placeholder" />
+  <input
+    class="kit-input"
+    :value="value"
+    @change="onChangeValue"
+    :placeholder="placeholder"
+    :type="type"
+  />
+  <span class="error" v-if="error !== undefined">{{ error }}</span>
 </template>
 
 <script lang="ts">
@@ -8,8 +15,10 @@ import type { PropType } from 'vue'
 
 type Props = {
   value: string
-  onChange: (value: string) => void
   placeholder?: string
+  type?: HTMLInputElement['type']
+  error?: string | undefined
+  onChange: (value: string) => void
 }
 
 interface InputEvent extends Event {
@@ -21,7 +30,9 @@ export default defineComponent({
   props: {
     value: Object as PropType<Props['value']>,
     onChange: Object as PropType<Props['onChange']>,
-    placeholder: Object as PropType<Props['placeholder']>
+    placeholder: Object as PropType<Props['placeholder']>,
+    type: Object as PropType<Props['type']>,
+    error: Object as PropType<Props['error']>
   },
   methods: {
     onChangeValue(e: Event) {
@@ -41,5 +52,11 @@ export default defineComponent({
   border-radius: var(--border-radius-l);
   width: 100%;
   height: 55px;
+}
+
+.error {
+  color: rgb(209, 25, 25);
+  font-family: Montserrat;
+  font-size: 14px;
 }
 </style>
