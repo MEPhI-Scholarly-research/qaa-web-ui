@@ -1,0 +1,22 @@
+{
+  "quiz": {
+    "type": 1,
+    "title": "Hello first quiz!!",
+    "description": "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков",
+    "time_limit": 23402343,
+    "questions": [
+      {
+        "type": 1,
+        "title": "Hello, this is new question",
+        "description": "This is desc",
+        "serial": 0,
+        "options": [
+          { "title": "string1", "serial": 0 },
+          { "title": "string2", "serial": 1 },
+          { "title": "string3", "serial": 2 },
+          { "title": "string4", "serial": 3 }
+        ]
+      }
+    ]
+  }
+}

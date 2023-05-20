@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { PropType } from 'vue'
-import CardInputContent from '../variants/Input.vue'
 
 type Props = {
   title: string

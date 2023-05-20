@@ -13,7 +13,7 @@ apiClient.interceptors.request.use((request) => {
   const currentAccessToken = getToken()
 
   if (currentAccessToken) {
-    request.headers.token = currentAccessToken
+    request.headers['Access-Token'] = currentAccessToken
   }
 
   return request
