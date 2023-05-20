@@ -7,6 +7,7 @@ import type { Card as CardType } from '@/shared/types'
 import { getNextCard } from '@/shared/sockets'
 import Loader from '@/shared/uiKit/Loader.vue'
 import FallbackError from '@/shared/components/FallbackError.vue'
+import QuizPreview from '@/widgets/quizPreview/index.vue'
 import type { AxiosError } from 'axios'
 
 type Data = {
@@ -14,6 +15,10 @@ type Data = {
   io: Socket | undefined
   currentCard: CardType | undefined
   loading: boolean
+  data: {
+    quiz: { uuid: string; title: string; description: string; time_limit: number; owner: string }
+  }
+  isPreview: boolean
   error: {
     notFound: boolean
     quizInactive: boolean
@@ -23,18 +28,14 @@ type Data = {
 
 export default {
   name: 'Play',
-  components: { Card, Loader, FallbackError },
+  components: { Card, Loader, FallbackError, QuizPreview },
   beforeCreate() {
     apiClient
-      .get<{ sessionToken: string }>(`/quiz/get_session_token?code=${this.$route.query.code}`)
+      .get<any>(`/quiz/${this.$route.query.code}`)
       .then((response) => {
-        this.sessionToken = response.data.sessionToken
-        localStorage.setItem('sessionToken', response.data.sessionToken)
-        this.io = getIO()
-        getNextCard(this?.io as any).then((data) => {
-          this.currentCard = data.payload
-          this.loading = false
-        })
+        this.data = response.data
+        console.log(this.data.quiz)
+        this.loading = false
       })
       .catch((err: AxiosError) => {
         switch (err?.response?.status) {
@@ -59,6 +60,32 @@ export default {
     },
     onNext(value: string) {
       console.log('next', value)
+    },
+    onStart() {
+      this.loading = true
+      this.isPreview = false
+      apiClient
+        .get<any>(`/quiz/start/${this.data.quiz.uuid}`)
+        .then((response) => {
+          console.log({ response })
+          this.loading = false
+        })
+        .catch((err: AxiosError) => {
+          switch (err?.response?.status) {
+            case 404:
+              this.error.notFound = true
+              break
+            case 451:
+              this.error.quizInactive = true
+              break
+
+            default:
+              this.error.other = true
+              break
+          }
+
+          this.loading = false
+        })
     }
   },
   data() {
@@ -67,6 +94,8 @@ export default {
       io: undefined,
       currentCard: undefined,
       loading: true,
+      data: {},
+      isPreview: true,
       error: {
         notFound: false,
         quizInactive: false,
@@ -80,7 +109,23 @@ export default {
 <template>
   <div class="loaderWrapper" v-if="loading"><Loader :loading="loading"></Loader></div>
 
-  <section class="main" v-if="!loading && !(error.notFound || error.quizInactive || error.other)">
+  <section
+    class="main"
+    v-if="isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
+  >
+    <QuizPreview
+      :title="data.quiz.title"
+      :description="data.quiz.description"
+      :duration="data.quiz.time_limit / 1000"
+      :owner="data.quiz.owner"
+      :onStart="onStart"
+    ></QuizPreview>
+  </section>
+
+  <section
+    class="main"
+    v-if="!isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
+  >
     <Card
       :title="currentCard?.title"
       :description="currentCard?.description"

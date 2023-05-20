@@ -57,7 +57,7 @@ export default {
       </div>
     </div>
     <div class="footer">
-      <div class="start"><button class="btn button-next" :on-click="onStart">Начать</button></div>
+      <div class="start"><button class="btn button-next" @click="onStart">Начать</button></div>
     </div>
   </div>
 </template>
