@@ -3,7 +3,6 @@ import KitButton from '@/shared/uiKit/Button.vue'
 import KitInput from '@/shared/uiKit/Input.vue'
 import KitLink from '@/shared/uiKit/Link.vue'
 import { setToken, setUserInfo } from '@/shared/utils/auth/storage'
-import router from '@/app/routes'
 import { apiClient } from '@/app/api'
 import type { AccessTokenPayload } from '@/shared/common/types'
 
@@ -19,16 +18,22 @@ export default {
   methods: {
     onAuth() {
       apiClient
-        .post<{ accessToken: string; payload: AccessTokenPayload }>('user/getAccessToken', {
-          login: this.login,
+        .patch<{ token: string; payload: AccessTokenPayload }>('/login', {
+          username: this.login,
           password: this.password
         })
         .then((response) => {
-          setToken(response.data.accessToken)
-          setUserInfo(response.data.payload)
+          setToken(response.data.token)
+          setUserInfo({ displayName: 'default', login: '123' })
 
           const { path, query } = this.$route.query as { path: string; query: string }
-          router.push({ path, query: JSON.parse(query) })
+
+          if (query === undefined) {
+            window.location.replace('/')
+          } else {
+            const { code } = JSON.parse(query) as { code: string }
+            window.location.replace(`${path}?code=${code}`)
+          }
         })
         .catch((err) => {
           console.log({ err })

@@ -67,22 +67,19 @@ export default {
         this.repeatPasswordError = 'Ошибка: пароли не совпадают'
       } else {
         this.repeatPasswordError = ''
-        // ...
+        apiClient
+          .post<{ accessToken: string; payload: AccessTokenPayload }>('/register', {
+            username: this.login,
+            password: this.password
+          })
+          .then((response) => {
+            this.$router.push({ name: 'auth' })
+          })
+          .catch((err) => {
+            console.log({ err })
+          })
       }
-      // apiClient
-      //   .post<{ accessToken: string; payload: AccessTokenPayload }>('user/getAccessToken', {
-      //     login: this.login,
-      //     password: this.password
-      //   })
-      //   .then((response) => {
-      //     setToken(response.data.accessToken)
-      //     setUserInfo(response.data.payload)
-      //     const { path, query } = this.$route.query as { path: string; query: string }
-      //     router.push({ path, query: JSON.parse(query) })
-      //   })
-      //   .catch((err) => {
-      //     console.log({ err })
-      //   })
+
       // здесь будет регистрация и проверка пароля
     }
   }

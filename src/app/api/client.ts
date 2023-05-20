@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API_URL } from '@/app/constants'
 import { getToken } from '@/shared/utils/auth/storage'
-import router from '../routes'
+// import router from '../routes'
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -28,9 +28,8 @@ apiClient.interceptors.response.use(
 
     if (error.response.status === 401 && !originalRequest._retry) {
       // originalRequest._retry = true;
-      router.push({ name: 'auth' })
+      // router.push({ name: 'auth' })
       // const refreshToken = localStorage.getItem('refreshToken');
-
       // if (refreshToken) {
       //   return axios
       //     .post(
@@ -43,7 +42,6 @@ apiClient.interceptors.response.use(
       //     )
       //     .then((response) => {
       //       setAccessToken(response.data.access_token);
-
       //       return apiClient(originalRequest);
       //     })
       //     .catch((e) => {

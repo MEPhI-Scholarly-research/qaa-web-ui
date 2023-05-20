@@ -16,8 +16,8 @@ export default {
       this.code = value
     },
     onEnter() {
-      console.log(this.code)
       router.push({ name: 'play', query: { code: this.code } })
+      // console.log(this.code)
     }
   }
 }
