@@ -10,7 +10,6 @@ type Props = {
 
 export default {
   name: 'card',
-  components: { CardInputContent },
   props: {
     title: Object as PropType<Props['title']>,
     description: Object as PropType<Props['description']>,
@@ -43,7 +42,7 @@ export default {
       {{ description }}
     </div>
     <div class="cardInput">
-      <CardInputContent :value="value" :on-change="onChange" />
+      <KitInput :value="value" :on-change="onChange" placeholder="Ваш ответ:"></KitInput>
     </div>
     <div class="footer">
       <div class="skip">

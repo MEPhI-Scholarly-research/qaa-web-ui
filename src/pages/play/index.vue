@@ -1,23 +1,32 @@
 <script lang="ts">
 import type { Socket } from 'socket.io-client'
 import { apiClient } from '@/app/api'
-import { getIO } from '@/shared/sockets'
-import Card from '@/widgets/card/ui/index.vue'
-import type { Card as CardType } from '@/shared/types'
-import { getNextCard } from '@/shared/sockets'
+import Card from '@/widgets/card/SelectCard.vue'
 import Loader from '@/shared/uiKit/Loader.vue'
 import FallbackError from '@/shared/components/FallbackError.vue'
 import QuizPreview from '@/widgets/quizPreview/index.vue'
 import type { AxiosError } from 'axios'
 
+type Option = {
+  title: string
+  serial: number
+}
+
+type Question = {
+  title: string
+  description: string
+  options: Option[]
+}
+
 type Data = {
   sessionToken: string
   io: Socket | undefined
-  currentCard: CardType | undefined
+  currentCard: any
   loading: boolean
-  data: {
+  prevData: {
     quiz: { uuid: string; title: string; description: string; time_limit: number; owner: string }
   }
+  questions: Question[]
   isPreview: boolean
   error: {
     notFound: boolean
@@ -33,8 +42,8 @@ export default {
     apiClient
       .get<any>(`/quiz/${this.$route.query.code}`)
       .then((response) => {
-        this.data = response.data
-        console.log(this.data.quiz)
+        this.prevData = response.data
+        console.log(this.prevData.quiz)
         this.loading = false
       })
       .catch((err: AxiosError) => {
@@ -55,20 +64,25 @@ export default {
       })
   },
   methods: {
-    onSkip(value: string) {
-      console.log('Skip', value)
+    onSkip(serial: number) {
+      console.log('Skip', serial)
     },
-    onNext(value: string) {
-      console.log('next', value)
+    onNext(serial: number) {
+      console.log('next', serial)
+    },
+    onSelect(serial: number) {
+      console.log('select', serial)
     },
     onStart() {
       this.loading = true
       this.isPreview = false
       apiClient
-        .get<any>(`/quiz/start/${this.data.quiz.uuid}`)
+        .get<any>(`/quiz/start/${this.prevData.quiz.uuid}`)
         .then((response) => {
           console.log({ response })
           this.loading = false
+          this.questions = response.data.quiz.questions
+          this.currentCard = this.questions[0]
         })
         .catch((err: AxiosError) => {
           switch (err?.response?.status) {
@@ -94,7 +108,7 @@ export default {
       io: undefined,
       currentCard: undefined,
       loading: true,
-      data: {},
+      prevData: {},
       isPreview: true,
       error: {
         notFound: false,
@@ -114,10 +128,10 @@ export default {
     v-if="isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
   >
     <QuizPreview
-      :title="data.quiz.title"
-      :description="data.quiz.description"
-      :duration="data.quiz.time_limit / 1000"
-      :owner="data.quiz.owner"
+      :title="prevData.quiz.title"
+      :description="prevData.quiz.description"
+      :duration="prevData.quiz.time_limit / 1000"
+      :owner="prevData.quiz.owner"
       :onStart="onStart"
     ></QuizPreview>
   </section>
@@ -129,6 +143,8 @@ export default {
     <Card
       :title="currentCard?.title"
       :description="currentCard?.description"
+      :options="currentCard.options"
+      :onSelect="onSelect"
       :on-next="onNext"
       :on-skip="onSkip"
     ></Card>
