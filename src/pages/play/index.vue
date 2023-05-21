@@ -5,6 +5,7 @@ import Loader from '@/shared/uiKit/Loader.vue'
 import FallbackError from '@/shared/components/FallbackError.vue'
 import QuizPreview from '@/widgets/quizPreview/index.vue'
 import EndingTest from '@/widgets/endingTest/index.vue'
+import Timer from '@/widgets/timer/index.vue'
 import type { AxiosError } from 'axios'
 import { getIO } from '@/shared/sockets'
 
@@ -40,7 +41,7 @@ type Data = {
 
 export default {
   name: 'Play',
-  components: { Card, Loader, FallbackError, QuizPreview, EndingTest },
+  components: { Card, Loader, FallbackError, QuizPreview, EndingTest, Timer },
   beforeCreate() {
     apiClient
       .get<any>(`/quiz/${this.$route.query.code}`)
@@ -145,6 +146,14 @@ export default {
 <template>
   <!-- loader -->
   <div class="loaderWrapper" v-if="loading"><Loader :loading="loading"></Loader></div>
+
+  <!-- fixed timer -->
+  <Timer
+    :time_limit="prevData.quiz.time_limit"
+    v-if="
+      !isEnding && !isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
+    "
+  ></Timer>
 
   <!-- preview quiz
     TODO: move to component
