@@ -3,15 +3,16 @@ import type { PropType } from 'vue'
 type Option = {
   title: string
   serial: number
+  uuid: string
 }
 
 type Props = {
   title: string
   description: string
   options: Option[]
-  onSelect: (serial: number) => void
-  onSkip: (serial: number) => void
-  onNext: (vaseriallue: number) => void
+  onSelect: (uuid: string) => void
+  onSkip: (uuid: string) => void
+  onNext: (uuid: string) => void
 }
 
 export default {
@@ -26,13 +27,13 @@ export default {
   },
   data() {
     return {
-      value: 0
+      value: ''
     }
   },
   methods: {
-    onChange(serial: number) {
-      this.value = serial
-      this.onSelect && this.onSelect(serial)
+    onChange(uuid: string) {
+      this.value = uuid
+      this.onSelect && this.onSelect(uuid)
     },
     onLocalSkip() {
       this.onSkip && this.onSkip(this.value)
@@ -52,10 +53,8 @@ export default {
     </div>
     <div class="cardInput">
       <ul>
-        <li v-for="question in options" :key="question.serial">
-          <input type="radio" name="ans" @change="() => onChange(question.serial)" />{{
-            question.title
-          }}
+        <li v-for="option in options" :key="option.uuid">
+          <input type="radio" name="ans" @change="() => onChange(option.uuid)" />{{ option.title }}
         </li>
       </ul>
     </div>

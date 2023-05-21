@@ -1,11 +1,12 @@
 <script lang="ts">
-import type { Socket } from 'socket.io-client'
 import { apiClient } from '@/app/api'
 import Card from '@/widgets/card/SelectCard.vue'
 import Loader from '@/shared/uiKit/Loader.vue'
 import FallbackError from '@/shared/components/FallbackError.vue'
 import QuizPreview from '@/widgets/quizPreview/index.vue'
+import EndingTest from '@/widgets/endingTest/index.vue'
 import type { AxiosError } from 'axios'
+import { getIO } from '@/shared/sockets'
 
 type Option = {
   title: string
@@ -20,12 +21,14 @@ type Question = {
 
 type Data = {
   sessionToken: string
-  io: Socket | undefined
+  sendMessage: ReturnType<typeof getIO>['sendIOMessage'] | undefined
   currentCard: any
+  currentCardIndex: number
   loading: boolean
   prevData: {
     quiz: { uuid: string; title: string; description: string; time_limit: number; owner: string }
   }
+  isEnding: boolean
   questions: Question[]
   isPreview: boolean
   error: {
@@ -37,7 +40,7 @@ type Data = {
 
 export default {
   name: 'Play',
-  components: { Card, Loader, FallbackError, QuizPreview },
+  components: { Card, Loader, FallbackError, QuizPreview, EndingTest },
   beforeCreate() {
     apiClient
       .get<any>(`/quiz/${this.$route.query.code}`)
@@ -64,14 +67,28 @@ export default {
       })
   },
   methods: {
-    onSkip(serial: number) {
-      console.log('Skip', serial)
+    nextCard() {
+      if (this.currentCardIndex === this.questions.length - 1) {
+        this.isEnding = true
+      } else {
+        this.currentCard = this.questions[this.currentCardIndex + 1]
+        this.currentCardIndex++
+      }
     },
-    onNext(serial: number) {
-      console.log('next', serial)
+    onSkip(uuid: string) {
+      console.log('Skip', uuid)
+      this.nextCard()
     },
-    onSelect(serial: number) {
-      console.log('select', serial)
+    onNext(uuid: string) {
+      console.log('next', uuid)
+      this.nextCard()
+    },
+    onSelect(uuid: string) {
+      console.log('select', uuid)
+      this.sendMessage?.('answer', { question: this.currentCard.uuid, answer: uuid })
+    },
+    onFinish() {
+      this.sendMessage?.('finish', { token: this.sessionToken })
     },
     onStart() {
       this.loading = true
@@ -83,6 +100,9 @@ export default {
           this.loading = false
           this.questions = response.data.quiz.questions
           this.currentCard = this.questions[0]
+          this.sessionToken = response.data.token
+          const { sendIOMessage } = getIO(this.sessionToken, (socket) => console.log(socket))
+          this.sendMessage = sendIOMessage
         })
         .catch((err: AxiosError) => {
           switch (err?.response?.status) {
@@ -105,11 +125,13 @@ export default {
   data() {
     return {
       sessionToken: '',
-      io: undefined,
+      sendMessage: undefined,
       currentCard: undefined,
+      currentCardIndex: 0,
       loading: true,
       prevData: {},
       isPreview: true,
+      isEnding: false,
       error: {
         notFound: false,
         quizInactive: false,
@@ -121,11 +143,17 @@ export default {
 </script>
 
 <template>
+  <!-- loader -->
   <div class="loaderWrapper" v-if="loading"><Loader :loading="loading"></Loader></div>
 
+  <!-- preview quiz
+    TODO: move to component
+  -->
   <section
     class="main"
-    v-if="isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
+    v-if="
+      !isEnding && isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
+    "
   >
     <QuizPreview
       :title="prevData.quiz.title"
@@ -136,9 +164,20 @@ export default {
     ></QuizPreview>
   </section>
 
+  <!-- ending test -->
   <section
     class="main"
-    v-if="!isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
+    v-if="isEnding && !loading && !(error.notFound || error.quizInactive || error.other)"
+  >
+    <EndingTest :onFinish="onFinish"></EndingTest>
+  </section>
+
+  <!-- quiz cards -->
+  <section
+    class="main"
+    v-if="
+      !isEnding && !isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
+    "
   >
     <Card
       :title="currentCard?.title"
@@ -150,6 +189,7 @@ export default {
     ></Card>
   </section>
 
+  <!-- display errors -->
   <div
     class="errorWrapper"
     v-if="!loading && (error.notFound || error.quizInactive || error.other)"

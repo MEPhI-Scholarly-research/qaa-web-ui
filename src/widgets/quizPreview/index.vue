@@ -63,20 +63,6 @@ export default {
 </template>
 
 <style scoped>
-body {
-  font-family: 'Montserrat';
-}
-
-.main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100vh;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
 .quizPreview {
   max-width: 500px;
   padding: 24px 32px;
