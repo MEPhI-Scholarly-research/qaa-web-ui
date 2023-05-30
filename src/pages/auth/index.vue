@@ -4,7 +4,6 @@ import KitInput from '@/shared/uiKit/Input.vue'
 import KitLink from '@/shared/uiKit/Link.vue'
 import { setToken, setUserInfo } from '@/shared/utils/auth/storage'
 import { apiClient } from '@/app/api'
-import type { AccessTokenPayload } from '@/shared/common/types'
 
 export default {
   name: 'AuthPage',
@@ -18,13 +17,13 @@ export default {
   methods: {
     onAuth() {
       apiClient
-        .patch<{ token: string; payload: AccessTokenPayload }>('/login', {
+        .post<{ 'access-token': string; displayname: string }>('/login', {
           username: this.login,
           password: this.password
         })
         .then((response) => {
-          setToken(response.data.token)
-          setUserInfo({ displayName: 'default', login: '123' })
+          setToken(response.data['access-token'])
+          setUserInfo({ displayName: response.data.displayname })
 
           const { path, query } = this.$route.query as { path: string; query: string }
 

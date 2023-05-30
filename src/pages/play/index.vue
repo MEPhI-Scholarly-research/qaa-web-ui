@@ -1,24 +1,41 @@
 <script lang="ts">
-import type { Socket } from 'socket.io-client'
 import { apiClient } from '@/app/api'
-import { getIO } from '@/shared/sockets'
-import Card from '@/widgets/card/ui/index.vue'
-import type { Card as CardType } from '@/shared/types'
-import { getNextCard } from '@/shared/sockets'
+import Card from '@/widgets/card/SelectCard.vue'
 import Loader from '@/shared/uiKit/Loader.vue'
 import FallbackError from '@/shared/components/FallbackError.vue'
 import QuizPreview from '@/widgets/quizPreview/index.vue'
+import EndingTest from '@/widgets/endingTest/index.vue'
+import Timer from '@/widgets/timer/index.vue'
 import type { AxiosError } from 'axios'
+import { getIO } from '@/shared/sockets'
+import type { Socket } from 'socket.io-client'
+
+type Option = {
+  title: string
+  serial: number
+}
+
+type Question = {
+  title: string
+  description: string
+  options: Option[]
+}
 
 type Data = {
   sessionToken: string
-  io: Socket | undefined
-  currentCard: CardType | undefined
+  sendMessage: ReturnType<typeof getIO>['sendIOMessage'] | undefined
+  currentCard: any
+  currentCardIndex: number
   loading: boolean
-  data: {
+  prevData: {
     quiz: { uuid: string; title: string; description: string; time_limit: number; owner: string }
   }
+  socket: Socket | undefined
+  isEnding: boolean
+  isFinished: boolean
+  questions: Question[]
   isPreview: boolean
+  timer: number
   error: {
     notFound: boolean
     quizInactive: boolean
@@ -28,13 +45,13 @@ type Data = {
 
 export default {
   name: 'Play',
-  components: { Card, Loader, FallbackError, QuizPreview },
+  components: { Card, Loader, FallbackError, QuizPreview, EndingTest, Timer },
   beforeCreate() {
     apiClient
       .get<any>(`/quiz/${this.$route.query.code}`)
       .then((response) => {
-        this.data = response.data
-        console.log(this.data.quiz)
+        this.prevData = response.data
+        console.log(this.prevData.quiz)
         this.loading = false
       })
       .catch((err: AxiosError) => {
@@ -55,20 +72,58 @@ export default {
       })
   },
   methods: {
-    onSkip(value: string) {
-      console.log('Skip', value)
+    nextCard() {
+      if (this.currentCardIndex === this.questions.length - 1) {
+        this.isEnding = true
+      } else {
+        this.currentCard = this.questions[this.currentCardIndex + 1]
+        this.currentCardIndex++
+      }
     },
-    onNext(value: string) {
-      console.log('next', value)
+    onSkip(uuid: string) {
+      console.log('Skip', uuid)
+      this.nextCard()
+    },
+    onNext(uuid: string) {
+      console.log('next', uuid)
+      this.nextCard()
+    },
+    onSelect(uuid: string) {
+      console.log('select', uuid)
+      this.sendMessage?.('answer', { question: this.currentCard.uuid, answer: uuid })
+    },
+    onFinish() {
+      this.sendMessage?.('finish', { token: this.sessionToken })
+      this.socket?.disconnect()
+      this.isFinished = true
     },
     onStart() {
       this.loading = true
       this.isPreview = false
       apiClient
-        .get<any>(`/quiz/start/${this.data.quiz.uuid}`)
+        .get<any>(`/quiz/start/${this.prevData.quiz.uuid}`)
         .then((response) => {
           console.log({ response })
           this.loading = false
+          this.questions = response.data.quiz.questions
+          this.currentCard = this.questions[0]
+          this.sessionToken = response.data.token
+          const { sendIOMessage, socket } = getIO(this.sessionToken, (socket) =>
+            console.log(socket)
+          )
+
+          // Обработка времени
+          socket.on('message', (message) => {
+            const parsedMessage = JSON.parse(message) as { type: string; left: number }
+            if (parsedMessage.type === 'time') {
+              if (parsedMessage.left === 0) {
+                this.isFinished = true
+              }
+              this.timer = parsedMessage.left
+            }
+          })
+          this.sendMessage = sendIOMessage
+          this.socket = socket
         })
         .catch((err: AxiosError) => {
           switch (err?.response?.status) {
@@ -91,11 +146,16 @@ export default {
   data() {
     return {
       sessionToken: '',
-      io: undefined,
+      sendMessage: undefined,
       currentCard: undefined,
+      currentCardIndex: 0,
       loading: true,
-      data: {},
+      prevData: {},
       isPreview: true,
+      isEnding: false,
+      isFinished: false,
+      timer: 0,
+      socket: undefined,
       error: {
         notFound: false,
         quizInactive: false,
@@ -107,33 +167,63 @@ export default {
 </script>
 
 <template>
+  <!-- loader -->
   <div class="loaderWrapper" v-if="loading"><Loader :loading="loading"></Loader></div>
 
+  <div class="finished" v-if="isFinished">finished!!</div>
+
+  <!-- fixed timer -->
+  <Timer
+    :time_limit="timer"
+    v-if="
+      !isEnding && !isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
+    "
+  ></Timer>
+
+  <!-- preview quiz
+    TODO: move to component
+  -->
   <section
     class="main"
-    v-if="isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
+    v-if="
+      !isEnding && isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
+    "
   >
     <QuizPreview
-      :title="data.quiz.title"
-      :description="data.quiz.description"
-      :duration="data.quiz.time_limit / 1000"
-      :owner="data.quiz.owner"
+      :title="prevData.quiz.title"
+      :description="prevData.quiz.description"
+      :duration="prevData.quiz.time_limit / 1000"
+      :owner="prevData.quiz.owner"
       :onStart="onStart"
     ></QuizPreview>
   </section>
 
+  <!-- ending test -->
   <section
     class="main"
-    v-if="!isPreview && !loading && !(error.notFound || error.quizInactive || error.other)"
+    v-if="isEnding && !loading && !(error.notFound || error.quizInactive || error.other)"
+  >
+    <EndingTest :onFinish="onFinish"></EndingTest>
+  </section>
+
+  <!-- quiz cards -->
+  <section
+    class="main"
+    v-if="
+      !isEnding && !isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
+    "
   >
     <Card
       :title="currentCard?.title"
       :description="currentCard?.description"
+      :options="currentCard.options"
+      :onSelect="onSelect"
       :on-next="onNext"
       :on-skip="onSkip"
     ></Card>
   </section>
 
+  <!-- display errors -->
   <div
     class="errorWrapper"
     v-if="!loading && (error.notFound || error.quizInactive || error.other)"
