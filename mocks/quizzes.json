@@ -1,44 +1,29 @@
 {
   "quiz": {
     "type": 1,
-    "title": "Hello first quiz!!",
-    "description": "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков",
-    "time_limit": 23402343,
+    "title": "New quiz",
+    "description": "Не очень длинное описание для квиза",
+    "time_limit": 600000,
     "questions": [
       {
         "type": 1,
-        "title": "Hello, this is new question",
-        "description": "This is desc",
+        "title": "question1",
+        "description": "string",
         "serial": 0,
         "options": [
-          { "title": "string1", "serial": 0 },
-          { "title": "string2", "serial": 1 },
-          { "title": "string3", "serial": 2 },
-          { "title": "string4", "serial": 3 }
+          { "title": "answer11", "serial": 0, "is_correct": true },
+          { "title": "answer12", "serial": 1, "is_correct": false },
+          { "title": "answer13", "serial": 2, "is_correct": true }
         ]
       },
       {
         "type": 1,
-        "title": "Hello, this is new question2",
-        "description": "This is desc2",
-        "serial": 1,
+        "title": "question2",
+        "description": "string",
+        "serial": 0,
         "options": [
-          { "title": "string1", "serial": 0 },
-          { "title": "string2", "serial": 1 },
-          { "title": "string3", "serial": 2 },
-          { "title": "string4", "serial": 3 }
-        ]
-      },
-      {
-        "type": 1,
-        "title": "Hello, this is new question3",
-        "description": "This is desc3",
-        "serial": 2,
-        "options": [
-          { "title": "string1", "serial": 0 },
-          { "title": "string2", "serial": 1 },
-          { "title": "string3", "serial": 2 },
-          { "title": "string4", "serial": 3 }
+          { "title": "answer21", "serial": 0, "is_correct": false },
+          { "title": "answer22", "serial": 1, "is_correct": true }
         ]
       }
     ]

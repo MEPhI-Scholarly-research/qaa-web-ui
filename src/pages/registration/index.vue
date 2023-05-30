@@ -14,6 +14,15 @@
         </div>
 
         <div>
+          <label for="email">Имя</label>
+          <KitInput
+            placeholder="Введите ваше ися"
+            :value="displayName"
+            :onChange="(value) => (displayName = value)"
+          />
+        </div>
+
+        <div>
           <label for="password">Пароль</label>
           <KitInput
             placeholder="Введите пароль"
@@ -45,8 +54,6 @@
 <script lang="ts">
 import KitButton from '@/shared/uiKit/Button.vue'
 import KitInput from '@/shared/uiKit/Input.vue'
-import { setToken, setUserInfo } from '@/shared/utils/auth/storage'
-import router from '@/app/routes'
 import { apiClient } from '@/app/api'
 import type { AccessTokenPayload } from '@/shared/common/types'
 
@@ -56,6 +63,7 @@ export default {
   data() {
     return {
       login: '',
+      displayName: '',
       password: '',
       repeatPassword: '',
       repeatPasswordError: ''
@@ -70,9 +78,10 @@ export default {
         apiClient
           .post<{ accessToken: string; payload: AccessTokenPayload }>('/register', {
             username: this.login,
-            password: this.password
+            password: this.password,
+            displayname: this.displayName
           })
-          .then((response) => {
+          .then(() => {
             this.$router.push({ name: 'auth' })
           })
           .catch((err) => {
