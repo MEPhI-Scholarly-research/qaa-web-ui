@@ -8,6 +8,7 @@ import EndingTest from '@/widgets/endingTest/index.vue'
 import Timer from '@/widgets/timer/index.vue'
 import type { AxiosError } from 'axios'
 import { getIO } from '@/shared/sockets'
+import type { Socket } from 'socket.io-client'
 
 type Option = {
   title: string
@@ -29,9 +30,12 @@ type Data = {
   prevData: {
     quiz: { uuid: string; title: string; description: string; time_limit: number; owner: string }
   }
+  socket: Socket | undefined
   isEnding: boolean
+  isFinished: boolean
   questions: Question[]
   isPreview: boolean
+  timer: number
   error: {
     notFound: boolean
     quizInactive: boolean
@@ -90,6 +94,8 @@ export default {
     },
     onFinish() {
       this.sendMessage?.('finish', { token: this.sessionToken })
+      this.socket?.disconnect()
+      this.isFinished = true
     },
     onStart() {
       this.loading = true
@@ -102,8 +108,22 @@ export default {
           this.questions = response.data.quiz.questions
           this.currentCard = this.questions[0]
           this.sessionToken = response.data.token
-          const { sendIOMessage } = getIO(this.sessionToken, (socket) => console.log(socket))
+          const { sendIOMessage, socket } = getIO(this.sessionToken, (socket) =>
+            console.log(socket)
+          )
+
+          // Обработка времени
+          socket.on('message', (message) => {
+            const parsedMessage = JSON.parse(message) as { type: string; left: number }
+            if (parsedMessage.type === 'time') {
+              if (parsedMessage.left === 0) {
+                this.isFinished = true
+              }
+              this.timer = parsedMessage.left
+            }
+          })
           this.sendMessage = sendIOMessage
+          this.socket = socket
         })
         .catch((err: AxiosError) => {
           switch (err?.response?.status) {
@@ -133,6 +153,9 @@ export default {
       prevData: {},
       isPreview: true,
       isEnding: false,
+      isFinished: false,
+      timer: 0,
+      socket: undefined,
       error: {
         notFound: false,
         quizInactive: false,
@@ -147,9 +170,11 @@ export default {
   <!-- loader -->
   <div class="loaderWrapper" v-if="loading"><Loader :loading="loading"></Loader></div>
 
+  <div class="finished" v-if="isFinished">finished!!</div>
+
   <!-- fixed timer -->
   <Timer
-    :time_limit="prevData.quiz.time_limit"
+    :time_limit="timer"
     v-if="
       !isEnding && !isPreview && !loading && !(error.notFound || error.quizInactive || error.other)
     "

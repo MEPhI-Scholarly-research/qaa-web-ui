@@ -17,7 +17,7 @@ export const getIO = (
   socket.emit('message', JSON.stringify({ type: 'connection', token: sesstionToken }))
 
   socket.on('message', (data) => {
-    console.log({ data })
+    // console.log({ data })
   })
 
   socket.on('disconnect', () => {

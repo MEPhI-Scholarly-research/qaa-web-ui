@@ -1,12 +1,10 @@
 <template>
   <div class="timer">
-    <h2>
-      Оставшиеся время:
-      <div class="time">
-        <div class="minutes">{{ minutes }}</div>
-        <div class="seconds">{{ seconds }}</div>
-      </div>
-    </h2>
+    <h2 class="title">Осталось времени:</h2>
+    <div class="time">
+      <div class="minutes">{{ Math.floor(timer / 60) }} мин</div>
+      <div class="seconds">{{ timer % 60 }} сек</div>
+    </div>
   </div>
 </template>
 
@@ -19,25 +17,48 @@ type Props = {
 
 export default {
   name: 'Timer',
-  beforeMount() {
-    this.timer = setInterval(() => {
-      const seconds = (this.time_limit || 0) / 1000
-      this.minutes = Math.floor(seconds / 60)
-      this.seconds = seconds % 60
-    }, 1000)
-  },
-  beforeUnmount() {
-    clearInterval(this.timer)
-  },
   props: {
     time_limit: Object as PropType<Props['time_limit']>
   },
   data() {
     return {
-      timer: 0,
-      minutes: 0,
-      seconds: 0
+      timer: 0
+    }
+  },
+  watch: {
+    time_limit: function (prev, next) {
+      this.timer = Math.floor(next / 1000)
     }
   }
 }
 </script>
+
+<style scoped>
+.timer {
+  position: absolute;
+  left: 32px;
+  top: 70px;
+  width: 225px;
+  height: 100px;
+  padding: 16px 12px;
+  border: 1px solid #e9e9e9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 11px;
+  color: var(--text-main-color);
+}
+.title {
+  font-family: MontserratBold;
+  font-size: 14px;
+}
+
+.time {
+  display: flex;
+  gap: 12px;
+  font-family: MontserratBlack;
+  margin-top: 4px;
+  color: var(--text-main-color);
+}
+</style>
