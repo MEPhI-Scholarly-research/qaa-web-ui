@@ -9,6 +9,7 @@ import Timer from '@/widgets/timer/index.vue'
 import type { AxiosError } from 'axios'
 import { getIO } from '@/shared/sockets'
 import type { Socket } from 'socket.io-client'
+import { decodeToken } from '@/shared/utils'
 
 type Option = {
   title: string
@@ -28,9 +29,18 @@ type Data = {
   currentCardIndex: number
   loading: boolean
   prevData: {
-    quiz: { uuid: string; title: string; description: string; time_limit: number; owner: string }
+    quiz: {
+      uuid: string
+      title: string
+      description: string
+      time_limit: number
+      owner: string
+    }
   }
+  lastAnswer: string
+  previousAnswers: { question: string; answers: string[] }[]
   socket: Socket | undefined
+  sessionId: string | undefined
   isEnding: boolean
   isFinished: boolean
   questions: Question[]
@@ -51,7 +61,6 @@ export default {
       .get<any>(`/quiz/${this.$route.query.code}`)
       .then((response) => {
         this.prevData = response.data
-        console.log(this.prevData.quiz)
         this.loading = false
       })
       .catch((err: AxiosError) => {
@@ -76,6 +85,9 @@ export default {
       if (this.currentCardIndex === this.questions.length - 1) {
         this.isEnding = true
       } else {
+        console.log(this.lastAnswer)
+        this.lastAnswer = this.previousAnswers[this.currentCardIndex + 1]?.answers[0] || ''
+        console.log(this.lastAnswer)
         this.currentCard = this.questions[this.currentCardIndex + 1]
         this.currentCardIndex++
       }
@@ -96,6 +108,7 @@ export default {
       this.sendMessage?.('finish', { token: this.sessionToken })
       this.socket?.disconnect()
       this.isFinished = true
+      this.$router.push({ name: 'individualResults', params: { sessionId: this.sessionId } })
     },
     onStart() {
       this.loading = true
@@ -106,8 +119,11 @@ export default {
           console.log({ response })
           this.loading = false
           this.questions = response.data.quiz.questions
-          this.currentCard = this.questions[0]
+          this.currentCard = this.questions[0] // можно ставить уже решенный
+          this.previousAnswers = response.data.answers
+          this.lastAnswer = this.previousAnswers[0].answers[0]
           this.sessionToken = response.data.token
+          this.sessionId = decodeToken(response.data.token)['session-uuid'] as string
           const { sendIOMessage, socket } = getIO(this.sessionToken, (socket) =>
             console.log(socket)
           )
@@ -156,6 +172,7 @@ export default {
       isFinished: false,
       timer: 0,
       socket: undefined,
+      lastAnswer: '',
       error: {
         notFound: false,
         quizInactive: false,
@@ -220,6 +237,7 @@ export default {
       :onSelect="onSelect"
       :on-next="onNext"
       :on-skip="onSkip"
+      :defaultValue="lastAnswer"
     ></Card>
   </section>
 
