@@ -2,7 +2,6 @@
 import type { Route } from '@/app/routes/routes'
 import { getUserInfo, clearToken, clearUserInfo } from '@/shared/utils/auth/storage'
 import { isAuth } from '@/shared/utils'
-console.log({ auth: isAuth() })
 export default {
   name: 'MainHeader',
   data() {
@@ -36,11 +35,12 @@ export default {
       </div>
       <div class="left">
         <ul class="menu">
-          <li v-for="route in routes" :key="route.name">
-            <router-link :to="{ name: route.name }" v-if="route.meta.show">
+          <li v-for="route in routes.filter((route) => route.meta.show)" :key="route.name">
+            <router-link :to="{ name: route.name }">
               <span class="itemLabel">{{ route.meta.title }}</span>
             </router-link>
           </li>
+          <li class="logged" v-if="isAuth">Привет, {{ displayName }}</li>
           <li v-if="isAuth">
             <span class="itemLabel" @click="logout">Выйти</span>
           </li>
@@ -48,7 +48,6 @@ export default {
             <span class="itemLabel" @click="login">Войти</span>
           </li>
         </ul>
-        <span class="logged" v-if="isAuth">Привет, {{ displayName }}</span>
       </div>
     </nav>
   </header>
@@ -105,9 +104,11 @@ header {
 
 .logged {
   font-family: Montserrat;
+  font-size: 14px;
   background-color: var(--main-color);
   color: var(--text-main-color-reverse);
   padding: 5px 10px;
   border-radius: 16px;
+  margin-left: 32px;
 }
 </style>

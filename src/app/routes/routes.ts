@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 
 import HomeView from '@/pages/home/index.vue'
 import PlayView from '@/pages/play/index.vue'
+import UserResults from '@/pages/userResults/index.vue'
 import InvitePage from '@/pages/invite/index.vue'
 import AuthPage from '@/pages/auth/index.vue'
 import RegistrationPage from '@/pages/registration/index.vue'
@@ -41,6 +42,16 @@ export const routes: RouteRecordRaw[] = [
     component: PlayView,
     meta: {
       title: 'Play',
+      private: true,
+      show: false
+    }
+  },
+  {
+    path: '/individual_results/:sessionId',
+    name: 'individualResults',
+    component: UserResults,
+    meta: {
+      title: 'Individual Results',
       private: true,
       show: false
     }
