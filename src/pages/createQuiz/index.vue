@@ -1,10 +1,12 @@
 <template>
-  <div class="quizCreatorWrapper"></div>
+  <div class="quizCreatorWrapper">
+    <div class="quizCreator"></div>
+  </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: 'QuizCreator',
+  name: 'QuizCreate',
   data() {
     return {
       currentStep: 'common'
@@ -13,7 +15,6 @@ export default {
 }
 </script>
 
-<style scoped>
-.quizCreatorWrapper {
-}
+<style scoped lang="scss">
+@import './styles.module.scss';
 </style>

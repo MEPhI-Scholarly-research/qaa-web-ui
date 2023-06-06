@@ -100,9 +100,10 @@ export default {
       console.log('next', uuid)
       this.nextCard()
     },
-    onSelect(uuid: string) {
-      console.log('select', uuid)
-      this.sendMessage?.('answer', { question: this.currentCard.uuid, answer: uuid })
+    onSelect(next: string, prev: string) {
+      console.log({ next, prev })
+      this.sendMessage?.('answer', { question: this.currentCard.uuid, answer: next })
+      prev && this.sendMessage?.('delete-answer', { question: this.currentCard.uuid, answer: prev })
     },
     onFinish() {
       this.sendMessage?.('finish', { token: this.sessionToken })
@@ -114,14 +115,15 @@ export default {
       this.loading = true
       this.isPreview = false
       apiClient
-        .get<any>(`/quiz/start/${this.prevData.quiz.uuid}`)
+        .patch<any>(`/quiz/${this.prevData.quiz.uuid}/start`)
         .then((response) => {
           console.log({ response })
           this.loading = false
           this.questions = response.data.quiz.questions
           this.currentCard = this.questions[0] // можно ставить уже решенный
+          // console.log({ data: response.data })
           this.previousAnswers = response.data.answers
-          this.lastAnswer = this.previousAnswers[0].answers[0]
+          this.lastAnswer = this.previousAnswers?.[0]?.answers?.[0]
           this.sessionToken = response.data.token
           this.sessionId = decodeToken(response.data.token)['session-uuid'] as string
           const { sendIOMessage, socket } = getIO(this.sessionToken, (socket) =>
@@ -142,6 +144,7 @@ export default {
           this.socket = socket
         })
         .catch((err: AxiosError) => {
+          console.log({ err })
           switch (err?.response?.status) {
             case 404:
               this.error.notFound = true

@@ -6,6 +6,8 @@ import UserResults from '@/pages/userResults/index.vue'
 import InvitePage from '@/pages/invite/index.vue'
 import AuthPage from '@/pages/auth/index.vue'
 import RegistrationPage from '@/pages/registration/index.vue'
+import QuizCreate from '@/pages/createQuiz/index.vue'
+import QuizList from '@/pages/quizList/index.vue'
 
 export type Meta = {
   private: boolean
@@ -54,6 +56,26 @@ export const routes: RouteRecordRaw[] = [
       title: 'Individual Results',
       private: true,
       show: false
+    }
+  },
+  {
+    path: '/create_quiz',
+    name: 'createQuiz',
+    component: QuizCreate,
+    meta: {
+      title: 'Quiz Create',
+      private: true,
+      show: false
+    }
+  },
+  {
+    path: '/quiz/list',
+    name: 'quizList',
+    component: QuizList,
+    meta: {
+      title: 'Список квизов',
+      private: false,
+      show: true
     }
   },
   {
