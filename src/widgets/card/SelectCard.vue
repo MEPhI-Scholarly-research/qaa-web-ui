@@ -7,12 +7,14 @@ type Option = {
   uuid: string
 }
 
+type UUID = string
+
 type Props = {
   title: string
   description: string
   options: Option[]
   defaultValue: string
-  onSelect: (uuid: string) => void
+  onSelect: (next: UUID, prev: UUID) => void
   onSkip: (uuid: string) => void
   onNext: (uuid: string) => void
 }
@@ -35,8 +37,8 @@ export default {
   },
   methods: {
     onChange(uuid: string) {
+      this.onSelect && this.onSelect(uuid, this.value)
       this.value = uuid
-      this.onSelect && this.onSelect(uuid)
     },
     onLocalSkip() {
       this.onSkip && this.onSkip(this.value)
