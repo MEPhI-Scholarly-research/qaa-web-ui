@@ -59,13 +59,13 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/create_quiz',
+    path: '/quiz/create',
     name: 'createQuiz',
     component: QuizCreate,
     meta: {
-      title: 'Quiz Create',
+      title: 'Создать квиз',
       private: true,
-      show: false
+      show: true
     }
   },
   {
@@ -74,7 +74,7 @@ export const routes: RouteRecordRaw[] = [
     component: QuizList,
     meta: {
       title: 'Список квизов',
-      private: false,
+      private: true,
       show: true
     }
   },

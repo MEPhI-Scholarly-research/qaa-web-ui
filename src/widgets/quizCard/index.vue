@@ -72,16 +72,24 @@ export default {
   }
 }
 
-.quizPreview .title .titleText {
+.titleText {
   font-family: MontserratBold;
   font-size: 28px;
   margin-bottom: 16px;
   color: #333;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .desc {
   font-family: MontserratLight;
   font-style: italic;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .informationRow {
