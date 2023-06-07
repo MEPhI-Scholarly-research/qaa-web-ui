@@ -44,6 +44,9 @@
           title="Добавить ответ"
         />
       </div>
+      <div class="footer">
+        <KitButton :onClick="create" title="Создать квиз" />
+      </div>
     </div>
   </div>
 </template>
@@ -68,6 +71,9 @@ type Data = {
 import QuestionsSidebar from './QuestionsSidebar.vue'
 import KitInput from '@/shared/uiKit/Input.vue'
 import KitButton from '@/shared/uiKit/Button.vue'
+import type { PropType } from 'vue'
+import { apiClient } from '@/app/api'
+import router from '@/app/routes'
 
 export default {
   name: 'Constructor',
@@ -85,6 +91,37 @@ export default {
       ],
       currentQuestion: 0
     } as Data
+  },
+  props: {
+    commonData: Object as PropType<{ title: string; description: string; timeLimit: number }>
+  },
+  methods: {
+    create() {
+      apiClient
+        .post('/quiz', {
+          quiz: {
+            type: 1,
+            title: this.commonData?.title,
+            description: this.commonData?.description,
+            time_limit: (this.commonData?.timeLimit || 0) * 60 * 1000,
+            questions: this.questions.map((question, qSerial) => ({
+              type: 1,
+              serial: qSerial,
+              title: question.title,
+              description: question.description,
+              options: question.options.map((option, serial) => ({
+                title: option.title,
+                serial,
+                is_correct: serial === question.correctOptionIndex
+              }))
+            }))
+          }
+        })
+        .then(() => {
+          router.push({ name: 'quizList' })
+        })
+      console.log({ commonData: this.commonData, questions: this.questions })
+    }
   }
 }
 </script>

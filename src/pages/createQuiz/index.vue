@@ -2,8 +2,8 @@
   <div class="quizCreatorWrapper">
     <div class="quizCreator">
       <div class="createContent">
-        <Constructor v-if="currentStep === 'constructor'" />
-        <Common v-if="currentStep === 'common'" />
+        <Constructor v-if="currentStep === 'constructor'" :commonData="commonData"/>
+        <Common v-if="currentStep === 'common'" :onForward="onForward"/>
       </div>
       <div class="stepper">
         <ul>
@@ -17,6 +17,7 @@
 <script lang="ts">
 import Constructor from './constructor.vue'
 import Common from './common.vue'
+import type { PropType } from 'vue'
 
 type Option = {
   title: string
@@ -32,6 +33,7 @@ type Question = {
 type Data = {
   currentStep: 'common' | 'constructor'
   questions: Question[],
+  commonData: {title: string, description: string, timeLimit: number}
   steps: {value: string}[]
 }
 
@@ -42,11 +44,18 @@ export default {
     return {
       currentStep: 'common',
       questions: [],
+      commonData: {title: '', description: '', timeLimit: 0},
       steps: [
         {value: 'common'},
         {value: 'constructor'},
       ]
     } as Data
+  },
+  methods: {
+    onForward(data: any){
+      this.commonData = data
+      this.currentStep = 'constructor'
+    }
   }
 }
 </script>
